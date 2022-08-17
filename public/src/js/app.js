@@ -27,17 +27,18 @@ window.addEventListener("beforeinstallprompt", function (event) {
 
 const displayNotification = () => {
     if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.ready().then((workerReg) => {});
+        let options = {
+            body: "Successfully registered.",
+            icon: "",
+        };
+        navigator.serviceWorker.ready.then((workerReg) => {
+            workerReg.showNotification("Success (sw)", options);
+        });
     }
-    let options = {
-        body: "Successfully registered.",
-    };
-    new Notification("Success", options);
 };
 
 function askForNotificationPermission() {
     Notification.requestPermission(function (result) {
-        console.log("User Choice", result);
         if (result !== "granted") {
             console.log("No notification permission granted!");
         } else {
