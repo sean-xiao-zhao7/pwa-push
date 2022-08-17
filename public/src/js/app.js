@@ -29,7 +29,13 @@ const displayNotification = () => {
     if ("serviceWorker" in navigator) {
         let options = {
             body: "Successfully registered.",
-            icon: "",
+            actions: [
+                {
+                    action: "confirm",
+                    title: "OK",
+                    icon: "/src/images/icons/app-icon-48x48.png",
+                },
+            ],
         };
         navigator.serviceWorker.ready.then((workerReg) => {
             workerReg.showNotification("Success (sw)", options);
