@@ -38,9 +38,52 @@ const displayNotification = () => {
             ],
         };
         navigator.serviceWorker.ready.then((workerReg) => {
-            workerReg.showNotification("Success (sw)", options);
+            workerReg.showNotification("Success!", options);
         });
     }
+};
+
+const configurePushSub = () => {
+    if (!("serviceWorker" in navigator)) {
+        return;
+    }
+
+    let workerReg;
+    navigator.serviceWorker.ready
+        .then((result) => {
+            workerReg = result;
+            return workerReg.pushManager.getSubscription();
+        })
+        .then((subscription) => {
+            if (subscription === null) {
+                const vpk =
+                    "BBPTcrgqLG1YF047ikrcASD4Gs2J58WtCE-d1Etr_yAZa_U6F3MwEmdZ8Dt5kBElEdak0FOKGhRU8qmKEBitdq4";
+                const ui8 = urlBase64ToUint8Array(vpk);
+                return workerReg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: ui8,
+                });
+            } else {
+            }
+        })
+        .then((subscription) => {
+            return fetch(vars.firebaseUrlSubscription, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify(subscription),
+            });
+        })
+        .then((result) => {
+            if (result.ok) {
+                displayNotification();
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 };
 
 function askForNotificationPermission() {
@@ -48,7 +91,7 @@ function askForNotificationPermission() {
         if (result !== "granted") {
             console.log("No notification permission granted!");
         } else {
-            displayNotification();
+            configurePushSub();
         }
     });
 }
